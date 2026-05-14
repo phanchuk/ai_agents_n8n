@@ -1,4 +1,4 @@
-# 🤖 Study Project — AI Competitor Monitoring Agent
+# 🤖 AI Competitor Monitoring Agent
 
 An agentic AI workflow designed to automate competitor intelligence and explore different levels of AI autonomy using n8n and LLMs.
 
