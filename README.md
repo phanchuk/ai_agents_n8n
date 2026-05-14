@@ -80,7 +80,8 @@ The goal of this project was to design a reusable AI system that:
 
 
 ### Agentic Workflow
-_Add screenshot_
+<img width="1878" height="850" alt="image" src="https://github.com/user-attachments/assets/31e99a42-b4a5-4953-b56a-36435eec0f42" />
+
 
 ### Autonomous Workflow
 _Add screenshot_
