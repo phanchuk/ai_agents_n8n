@@ -84,7 +84,8 @@ The goal of this project was to design a reusable AI system that:
 
 
 ### Autonomous Workflow
-_Add screenshot_
+<img width="1858" height="933" alt="image" src="https://github.com/user-attachments/assets/79ca4f61-b894-4911-a8af-5f3bd50409dd" />
+
 
 ---
 
