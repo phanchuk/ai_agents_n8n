@@ -1,94 +1,107 @@
-# 🤖 AI Competitor Monitoring Agent
+# 🤖 AI Agents with n8n — Product Manager GenAI Portfolio
 
-An agentic AI workflow designed to automate competitor intelligence and explore different levels of AI autonomy using n8n and LLMs.
+A collection of hands-on AI workflow projects focused on exploring practical applications of GenAI, AI agents, MCP integrations, workflow orchestration, and automation from a Product Manager perspective.
 
-The project focuses on building an end-to-end workflow: from collecting competitor inputs and external signals to AI-powered research, synthesis, and automated report generation.
+This repository documents experiments with AI systems that move beyond prompting into connected tools, agent workflows, and operational automation.
 
----
-
-## 💡 Description & Goal
-
-Competitive research is often repetitive, fragmented, and difficult to scale.
-
-The goal of this project was to design a reusable AI system that:
-
-- reduces manual research effort
-- automates competitor monitoring
-- summarizes market changes and signals
-- explores single-agent and autonomous agent patterns
-- evaluates tradeoffs between control, cost, and autonomy
+The goal is not production-scale implementation, but developing intuition around emerging AI capabilities and understanding how Product Managers can leverage them to solve real workflow problems.
 
 ---
 
-## 💡 Key Features
+## 🎯 Learning Focus
 
-- Dynamic competitor source via Google Sheets
-- Automated web research using Perplexity API
-- GPT-powered report generation
-- Context compression for token optimization
-- Markdown → HTML transformation
-- Email delivery automation
-- Experimentation with multiple autonomy levels:
-  - Manual LLM workflow
-  - Agentic workflow
-  - Autonomous research agent
+Across these projects I explored:
 
----
-
-## 🛠 Tech Stack
-
-- n8n (workflow orchestration)
-- OpenAI GPT-5 (reasoning + synthesis)
-- Perplexity API (search & retrieval)
-- Google Sheets (competitor source)
-- Gmail API (report delivery)
-- JSON / Markdown processing
+- AI workflow orchestration using n8n
+- Agentic design patterns
+- MCP (Model Context Protocol) integrations
+- Voice interfaces and conversational agents
+- Human + AI collaboration patterns
+- Automation of repetitive PM workflows
+- Tradeoffs between autonomy, reliability, and control
+- Practical GenAI applications beyond chat interfaces
 
 ---
 
-## ⚙️ System Architecture (High-Level)
+# 📂 Projects
 
-### 1. Data Collection
-- Competitor list maintained in Google Sheets
-- Triggered manually or via scheduler
+## 1. 🎙️ Jira AI Voice Assistant
 
-### 2. Research Pipeline
-- AI retrieves recent information using Perplexity
-- Responses parsed and compressed
+An AI-powered voice assistant capable of interacting with Jira and productivity tools through natural language.
 
-### 3. Report Generation
-- Context aggregation
-- GPT synthesis
-- Markdown → HTML conversion
-- Automated email delivery
+Built with n8n, MCP, ElevenLabs, OpenAI, Gmail integrations, and cloud deployment via Elestio.
 
----
+Key areas explored:
 
-## 🧠 Product Thinking
+- Conversational AI workflows
+- Voice-triggered automation
+- Jira MCP integrations
+- AI agent planning + memory
+- Tool orchestration through webhooks
 
-- Focus on **signal over noise** by prioritizing meaningful updates
-- Designed around **autonomy vs reliability** tradeoffs
-- Optimized for **token efficiency** using compression and aggregation
-- Uses a **human-in-the-loop approach** where AI supports rather than replaces decisions
+**Tech stack:**  
+n8n · OpenAI · ElevenLabs · MCP · Jira · Gmail · Google Sheets · Elestio
+
+📁 See project README for architecture and implementation details.
 
 ---
 
-## 📸 Screenshots
+## 2. 🤖 AI Competitor Monitoring Agent
 
-### Manual LLM Workflow
-<img width="1441" height="608" alt="image" src="https://github.com/user-attachments/assets/c620e122-218e-4173-90b9-f79f3a9b607c" />
+An agentic workflow designed to automate competitive intelligence and experiment with different levels of AI autonomy.
 
+The system collects inputs, performs research, synthesizes findings, and generates automated reports.
 
-### Agentic Workflow
-<img width="1878" height="850" alt="image" src="https://github.com/user-attachments/assets/31e99a42-b4a5-4953-b56a-36435eec0f42" />
+Key areas explored:
 
+- Autonomous research agents
+- Multi-step AI workflows
+- Report generation
+- Signal prioritization
+- Autonomy vs reliability tradeoffs
 
-### Autonomous Workflow
-<img width="1858" height="933" alt="image" src="https://github.com/user-attachments/assets/79ca4f61-b894-4911-a8af-5f3bd50409dd" />
+**Tech stack:**  
+n8n · OpenAI · Perplexity API · Google Sheets · Gmail
 
+📁 See project README for workflow and architecture details.
+
+---
+
+## 3. 🎨 AI-Powered Figma → Jira Automation with MCP
+
+A workflow demonstrating how AI can transform Figma designs directly into Jira epics and stories.
+
+Built around Claude Desktop and MCP integrations to automate design-to-delivery workflows.
+
+Key areas explored:
+
+- MCP integrations
+- AI-assisted product operations
+- Design → execution automation
+- Prompt-driven workflows
+- AI workflow augmentation
+
+**Tech stack:**  
+Claude Desktop · MCP · Jira Cloud · Figma
+
+📁 See project README for setup instructions and examples.
+
+---
+
+## 🧠 Product Perspective
+
+These projects were built as practical exercises to strengthen AI Product Management capabilities:
+
+- understanding AI system behavior
+- designing workflows instead of isolated prompts
+- experimenting with emerging tooling ecosystems
+- learning agent architectures through implementation
+- building stronger intuition around AI opportunities and limitations
 
 ---
 
 ## 📌 Notes
 
-This project focuses on practical implementation of AI agents and workflow orchestration from a Product Manager perspective. The emphasis is on workflow design, operational tradeoffs, and experimentation with different levels of AI autonomy rather than production-scale implementation.
+Most implementations are inspired by case studies and tutorials from Product Compass and adapted as hands-on exercises.
+
+The focus is learning by building: understanding systems, experimenting with workflows, and developing practical AI product intuition.
