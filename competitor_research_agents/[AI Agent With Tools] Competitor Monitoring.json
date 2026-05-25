@@ -1,0 +1,1746 @@
+{
+  "name": "[AI Agent With Tools] Competitor Monitoring",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        480,
+        1888
+      ],
+      "id": "7d7e4251-62f6-4d8b-b0fb-255469be0878",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1lY44_zZxEyv7mjE3SNEqa9lTYckaob787CDYZDZLVho",
+          "mode": "list",
+          "cachedResultName": "Competitors - AI Vibe-Coding",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lY44_zZxEyv7mjE3SNEqa9lTYckaob787CDYZDZLVho/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lY44_zZxEyv7mjE3SNEqa9lTYckaob787CDYZDZLVho/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        688,
+        224
+      ],
+      "id": "63cc4dee-1d9a-4fa1-8da4-e8416ec6b2b5",
+      "name": "Get competitors",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "d0O5x5oiVqfptvKy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ervan.jacobss@gmail.com",
+        "subject": "Competitor updates",
+        "message": "={{ $json.htmlReport }}",
+        "options": {
+          "appendAttribution": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1264,
+        448
+      ],
+      "id": "0e1d136d-e77e-4339-a600-7319313df1de",
+      "name": "Send a message",
+      "webhookId": "4f56550a-f4c6-498b-9c88-89fafb5f277b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "esk6JrM7zOuD0qwC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.choices[0].message.content }}",
+        "destinationKey": "htmlReport",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        448
+      ],
+      "id": "9da390a3-a93c-4c29-963b-64c10f88b456",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        224
+      ],
+      "id": "b59b1854-c0fc-4329-954e-a823caf49002",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a **Perplexity results formatter**. Your task is to create a clean, uniform competitor monitoring report based on the provided Perplexity output.\n\n## Strict Output Contract\n- Output **markdown only** (no code fences, no extra commentary).\n- Start with: `## Competitor Monitoring Report (Last 30 Days)`\n- For each competitor:\n  - Use a heading: `### <Competitor Name>` (plain name, **no URL** in the heading)\n  - Then list **key findings** as bullet points (`- ...`)\n  - Insert **one blank line** between competitors.\n- If there are **no updates** for a competitor, output exactly:\n  - `### <Competitor Name>`\n  - `No updates`\n  - **Do not include any other text or links.**\n\n## Reference & Link Rules\n- Replace any Perplexity-style numeric references like `[1]`, `[2]` found inside the content with **inline markdown links** to the actual URLs.\n- If the input provides a `citations` array alongside `content`, treat it as a **1-based index** (i.e., `[1]` maps to `citations[0]`).\n- Remove duplicate links and remove any trailing \"Links:\" / \"### Links\" / footer link sections if present.\n- If a referenced index has **no matching URL**, omit that specific link text and keep the sentence readable.\n- If the same URL appears multiple times within a competitor section, keep only the **first occurrence**.\n\n## Content Guidance\n- Keep bullet points concise, factual, and focused on **new products, features, pricing, partnerships, incidents, or credible third‑party analyses** within the **last 30 days**.\n- If the section explicitly states there are **no updates**, follow the “No updates” rule above.\n- Avoid speculative language. If timing is unclear, prefer omitting rather than guessing.\n- Normalize phrasing (e.g., “Launched…”, “Introduced…”, “Announced…”, “No incidents reported…”).\n\n## Example (format only)\n<example>\n## Competitor Monitoring Report (Last 30 Days)\n\n### Accredible\nNo updates\n\n### Certifier\n- Launched a new AI certificate generator with instant PDF export (source)[https://certifier.io/blog/best-ai-certificate-makers]\n- Introduced dynamic attributes and certificate preview features (source)[https://certifier.io/blog/whats-new-at-certifier]\n</example>\n\n## Data\nBelow is the raw Perplexity answer. Use it as your only source of truth and **do not** include this JSON in the output.\n\n{{ $json.data.toJsonString() }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        720,
+        448
+      ],
+      "id": "90ed0fdb-ad1d-4985-9005-de004d21da4e",
+      "name": "Prepare a report (Message a model)",
+      "retryOnFail": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "42y8D680LILx68pa",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        224
+      ],
+      "id": "0521ca5f-4587-436c-8636-a7e75eeb74fc",
+      "name": "Aggregate responses"
+    },
+    {
+      "parameters": {
+        "content": "### 2. Run search via Perplexity API",
+        "height": 112,
+        "width": 150,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        880,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "eb87ac77-2170-4b63-9c6d-0d05561302ef",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "### 3. Parse response for relevant content only",
+        "height": 112,
+        "width": 150,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1072,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "08c91eda-68b0-485b-926b-70e586fc84b3",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "### 4. Aggregate responses into JSON to limit only to 1 call to LLM\n",
+        "height": 112,
+        "width": 166,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1248,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "de4a65b7-cd70-4581-9f60-325d2da98556",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "### 1. Fetch competitors from data source\n",
+        "height": 112,
+        "width": 150,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "f851517c-f446-4a8e-a416-b5b5db45fb87",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "### 5. Create a report with md formating to save tokens and reduce complexity",
+        "height": 144,
+        "width": 230,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        608
+      ],
+      "typeVersion": 1,
+      "id": "197ef2ee-a38a-4686-b0bd-b26f628aa0f7",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "### 6. Convert to HTML snippet",
+        "height": 144,
+        "width": 150,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1072,
+        608
+      ],
+      "typeVersion": 1,
+      "id": "17f37674-b84d-494c-942a-d6299247376e",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "### 7. Send  report to email",
+        "height": 144,
+        "width": 150,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1264,
+        608
+      ],
+      "typeVersion": 1,
+      "id": "8c1e5040-3afa-4eb1-9b70-8768b3ec31e2",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        1360
+      ],
+      "id": "bf5a1764-7a04-49a6-a465-f7f1fe2214c8",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "42y8D680LILx68pa",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        1360
+      ],
+      "id": "b3f85b1c-19c1-477e-b5fb-67c0571e15e7",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are a market researcher. \n\n<goal>\nYour goal is to: find important competitor insights published within the last 30 days.\n\nFocus specifically on:\n- New products, capabilities, or features\n- Important updates, announcements, or changes (pricing, partnerships, integrations)\n- Any official or credible third‑party analysis\n- User complaints (e.g., Reddit)\n<goal>\n\n<reasoning_steps>\n\nStep 1: Read competitors stored in a Google Sheet (tool use)\nStep 2: For each competitor, use Perplexity to find relevant information (tool use)\nStep 3: From the responses, take only citations & content to compress the context\nStep 4: Create a final report\n- Use markdown formatting to save tokens and reduce complexity\n- Follow the other assumptions about the format defined later\n\n</reasoning_steps>\n\n<report formatting>\n\n## Strict Output Contract\n- Output **markdown only** (no code fences, no extra commentary).\n- Start with: `## Competitor Monitoring Report (Last 30 Days)`\n- For each competitor:\n  - Use a heading: `### <Competitor Name>` (plain name, **no URL** in the heading)\n  - Then list **key findings** as bullet points (`- ...`)\n  - Insert **one blank line** between competitors.\n- If there are **no updates** for a competitor, output exactly:\n  - `### <Competitor Name>`\n  - `No updates`\n  - **Do not include any other text or links.**\n\n## Reference & Link Rules\n- Replace any Perplexity-style numeric references like `[1]`, `[2]` found inside the content with **inline markdown links** to the actual URLs.\n- If the input provides a `citations` array alongside `content`, treat it as a **1-based index** (i.e., `[1]` maps to `citations[0]`).\n- Remove duplicate links and remove any trailing \"Links:\" / \"### Links\" / footer link sections if present.\n- If a referenced index has **no matching URL**, omit that specific link text and keep the sentence readable.\n- If the same URL appears multiple times within a competitor section, keep only the **first occurrence**.\n\n## Content Guidance\n- Keep bullet points concise, factual, and focused on **new products, features, pricing, partnerships, incidents, or credible third‑party analyses** within the **last 30 days**.\n- If the section explicitly states there are **no updates**, follow the “No updates” rule above.\n- Avoid speculative language. If timing is unclear, prefer omitting rather than guessing.\n- Normalize phrasing (e.g., “Launched…”, “Introduced…”, “Announced…”, “No incidents reported…”).\n\n## Example (format only)\n<example>\n## Competitor Monitoring Report (Last 30 Days)\n\n### Lovable\nNo updates\n\n### Certifier\n- Launched a new AI certificate generator with instant PDF export (source)[https://certifier.io/blog/best-ai-certificate-makers]\n- Introduced dynamic attributes and certificate preview features (source)[https://certifier.io/blog/whats-new-at-certifier]\n</example>\n\n</report formatting>\n\n",
+        "options": {
+          "maxIterations": 30,
+          "returnIntermediateSteps": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        1136
+      ],
+      "id": "3a87db6d-cc46-4fb5-9386-e9e397bc35cc",
+      "name": "Research Agent",
+      "retryOnFail": true,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        1136
+      ],
+      "id": "61081627-5ede-4c4d-a748-15d7e2347287",
+      "name": "Markdown1"
+    },
+    {
+      "parameters": {
+        "sendTo": "ervan.jacobss@gmail.com",
+        "subject": "Competitor updates",
+        "message": "={{ $json.data }}",
+        "options": {
+          "appendAttribution": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1216,
+        1136
+      ],
+      "id": "fbdedbcf-bcb6-44f3-a2e9-73cf60f56cb2",
+      "name": "Send a message1",
+      "webhookId": "01598286-8e58-47c9-bb0c-df868d8b9a9e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "esk6JrM7zOuD0qwC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1lY44_zZxEyv7mjE3SNEqa9lTYckaob787CDYZDZLVho",
+          "mode": "list",
+          "cachedResultName": "Competitors - AI Vibe-Coding",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lY44_zZxEyv7mjE3SNEqa9lTYckaob787CDYZDZLVho/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lY44_zZxEyv7mjE3SNEqa9lTYckaob787CDYZDZLVho/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        1360
+      ],
+      "id": "9b4b63d2-4089-4bc2-bfd9-fcda959b04a3",
+      "name": "Get competitors1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "d0O5x5oiVqfptvKy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "messages": {
+          "message": [
+            {
+              "content": "=I’m conducting market research. \n\nFind important competitor insights about {{ $json.Competitors }} published within the last 30 days.\n\nFocus specifically on:\n- New products, capabilities, or features\n- Important updates, announcements, or changes (pricing, partnerships, integrations)\n- Any official or credible third‑party analysis\n- User compaints (e.g., Reddit)\n\nProvide links directly in the text, dates, and brief summaries. \n\nIMPORTANT: If there are no importnat updates, after the competitor name ALWAYS reply with \"No updates\" and do not include anything else.\n\n## Formatting\n- Start with '##' including ONLY a competitor name\n- Include relavant links directly at the bottom of the content, without relying on citations or skip them if no relevanc citations were found"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexity",
+      "typeVersion": 1,
+      "position": [
+        880,
+        224
+      ],
+      "id": "7d5abd21-3177-46d3-8800-8f9e65526195",
+      "name": "Message Perplexity",
+      "retryOnFail": true,
+      "credentials": {
+        "perplexityApi": {
+          "id": "m2ehNeMb2tAG88Tk",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "messages": {
+          "message": [
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message0_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        912,
+        1360
+      ],
+      "id": "72a3317b-4985-4be0-8b6a-e9363b83dc9a",
+      "name": "Message Perplexity1",
+      "credentials": {
+        "perplexityApi": {
+          "id": "m2ehNeMb2tAG88Tk",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {
+          "reasoningEffort": "low"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        2112
+      ],
+      "id": "971eda83-e8f8-4967-b4f5-863c366fa76d",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "42y8D680LILx68pa",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        2112
+      ],
+      "id": "8881e944-2785-49d6-a5bc-e0586970b865",
+      "name": "Think2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are a market researcher. \n\n<goal>\nYour goal is to:\nFind important competitor insights published within the last 30 days.\nFocus specifically on:\n- New products, capabilities, or features\n- Important updates, announcements, or changes (pricing, partnerships, integrations)\n- Any official or credible third‑party analysis\n- User complaints (e.g., Reddit)\n<goal>\n\nYou can find my competitors using the spreadsheet / sheets tool.\n\nUse the available tools to send me a well-structured, scannable Gmail summary (HTML) while avoiding unnecessary details with inline links to relevant sources and without links in the footer.\n\nIMPORTANT: If there are no news, just list the competitor and say \"No updates\".\n",
+        "options": {
+          "maxIterations": 30,
+          "returnIntermediateSteps": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        704,
+        1888
+      ],
+      "id": "b4177b22-c87e-4556-a45e-bea11439dedf",
+      "name": "Research Agent2",
+      "retryOnFail": true,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1lY44_zZxEyv7mjE3SNEqa9lTYckaob787CDYZDZLVho",
+          "mode": "list",
+          "cachedResultName": "Competitors - AI Vibe-Coding",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lY44_zZxEyv7mjE3SNEqa9lTYckaob787CDYZDZLVho/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lY44_zZxEyv7mjE3SNEqa9lTYckaob787CDYZDZLVho/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        2112
+      ],
+      "id": "c2bbedcc-0b3e-46e4-b91a-3a3ddcf1eeab",
+      "name": "Get competitors3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "d0O5x5oiVqfptvKy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "messages": {
+          "message": [
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message0_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        928,
+        2112
+      ],
+      "id": "9aa0be7d-a0dd-4923-8e60-6eb98640ee23",
+      "name": "Message Perplexity3",
+      "credentials": {
+        "perplexityApi": {
+          "id": "m2ehNeMb2tAG88Tk",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ervan.jacobss@gmail.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1216,
+        2112
+      ],
+      "id": "6cd3c908-15a6-45dc-8e5e-280d1885d296",
+      "name": "Send a message in Gmail1",
+      "webhookId": "b4fa0154-9aae-4298-b047-4abcce40eb54",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "esk6JrM7zOuD0qwC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 1. Manual LLM N8N Workflow\nNo Autonomy.",
+        "height": 112,
+        "width": 950,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        464,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "a0542270-abfb-4c2c-a8cc-1ec86dea9008",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# 2. Agentic Workflow\nLow Autonomy: steps in the agent prompt",
+        "height": 112,
+        "width": 950,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        464,
+        816
+      ],
+      "typeVersion": 1,
+      "id": "0571652d-30d9-41d6-8d4f-746808da2621",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "**1.2. Use Perplexity API**\nFind recent news about competitors",
+        "height": 80,
+        "width": 294,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        928,
+        1504
+      ],
+      "typeVersion": 1,
+      "id": "cd71e2fb-5d95-47f3-91bf-4f3bc335ed43",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "**1.1. Read competitors**\nStored in a Google Sheet",
+        "height": 80,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        1504
+      ],
+      "typeVersion": 1,
+      "id": "6f060f94-0cda-4367-a074-de63bde4c2ed",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "### 2. Convert to HTML",
+        "height": 96,
+        "width": 150,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1040,
+        1008
+      ],
+      "typeVersion": 1,
+      "id": "2179fd4e-af46-4800-865e-c5753c4c6480",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "### 3. Send the report to email\n",
+        "height": 96,
+        "width": 150,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1216,
+        1008
+      ],
+      "typeVersion": 1,
+      "id": "5fba04ff-f76a-4ba4-8a62-bf0ebadb2090",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "### 1. Find recent news about competitors and create a report\n",
+        "height": 96,
+        "width": 230,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        1008
+      ],
+      "typeVersion": 1,
+      "id": "a743ac41-3bbe-4f44-85b5-d8ab6c3bce76",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "# 3. AI Agent\nHigh Autonomy: all actions by the agent. The prompt contains only objective",
+        "height": 96,
+        "width": 950,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        1760
+      ],
+      "typeVersion": 1,
+      "id": "8edfc45c-bdcc-4f62-9c97-b76a0d79e1c2",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## GPT-5, low effort\nTask success: **100%** (185/185)\nAvg. total tokens: **4 543**\nAvg. time: **41s**\nAvg. prompt tokens: 3 255\nAvg. completion tokens: 1 288",
+        "height": 176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1456,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "2c4dc5b1-907c-46c3-a0eb-0a8e9fa03080",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## GPT-5, low reason.\nTask success: **100%** (185/185)\nAvg. total tokens: **15,605**\nAvg. time: **1m 09s**\nAvg. prompt tokens: 11,427\nAvg. completion tokens: 4,178\n### Better compression, fewer tool-call wrappers",
+        "height": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1456,
+        1072
+      ],
+      "typeVersion": 1,
+      "id": "be5d42c7-2e1a-4ade-a4c3-2eac9a8524f2",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "## GPT-5, low reason.\nTask success: **100%** (185/185)\nAvg. total tokens: **30,204**\nAvg. time: **1m 9s**\nAvg. prompt tokens: 27,026\nAvg. completion tokens: 3,178\n### Better compression, fewer tool-call wrappers",
+        "height": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1472,
+        2000
+      ],
+      "typeVersion": 1,
+      "id": "242ebe1e-0bf5-4a66-a4ad-fb0d32fa21aa",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "content": "## GTP-4o\nTask success: **100%** (185/185)\nAvg. total tokens: **34,860**\nAvg. time: **53s**\nAvg. prompt tokens: 33,795\nAvg. completion tokens: 1,065\n### Verbose encoding, larger JSON + metadata ",
+        "height": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1472,
+        1744
+      ],
+      "typeVersion": 1,
+      "id": "51531e0a-8e6a-46ce-a8b5-0dec7887ea00",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "content": "## GPT-4o\nTask success: **100%** (185/185)\nAvg. total tokens: **19,310**\nAvg. time: **42s**\nAvg. prompt tokens: 18,318\nAvg. completion tokens: 992\n### Verbose encoding, larger JSON + metadata ",
+        "height": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1456,
+        816
+      ],
+      "typeVersion": 1,
+      "id": "50ea6068-5725-4107-8ec5-8aebb8ef6e80",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "content": "## GPT-4o\nTask success: **98.4%** (182/185)\nAvg. total tokens: **2 705**\nAvg. time: **25s**\nAvg. prompt tokens: 2 557\nAvg. completion tokens: 148",
+        "height": 176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1456,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "b9993769-6daa-4b28-a93f-17b4ab7d82e6",
+      "name": "Sticky Note21"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const content =\n  $json?.choices?.[0]?.message?.content || \"\";\n\nreturn {\n  json: {\n    content\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        224
+      ],
+      "id": "8e40bfb7-d7e7-4f85-9d94-6ffe315ce825",
+      "name": "Parse response (JS script)"
+    }
+  ],
+  "pinData": {
+    "Get competitors": [
+      {
+        "json": {
+          "row_number": 2,
+          "Competitors": "Lovable (lovable.dev)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 3,
+          "Competitors": "Bolt.new (bolt.new)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4,
+          "Competitors": "Replit (replit.com)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 5,
+          "Competitors": "V0 by Vercel (v0.dev)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 6,
+          "Competitors": "Cursor (cursor.com)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 7,
+          "Competitors": "Figma Make (figma.com/ai)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Message Perplexity": [
+      {
+        "json": {
+          "id": "3f51020c-af2b-4093-b6d8-0785e58517bd",
+          "model": "sonar",
+          "created": 1778749740,
+          "usage": {
+            "prompt_tokens": 163,
+            "completion_tokens": 22,
+            "total_tokens": 185,
+            "search_context_size": "low",
+            "cost": {
+              "input_tokens_cost": 0.00016,
+              "output_tokens_cost": 0.00002,
+              "request_cost": 0.005,
+              "total_cost": 0.00519
+            }
+          },
+          "citations": [
+            "https://www.youtube.com/watch?v=IJnYWKdS_n4",
+            "https://lovable.dev/blog",
+            "https://docs.lovable.dev/changelog",
+            "https://www.youtube.com/watch?v=h7h-ShDI3-Y",
+            "https://lovable.dev/solutions",
+            "https://www.youtube.com/watch?v=12YlKk40YAI",
+            "https://lovable.dev/blog/2025-01-07-changelog",
+            "https://status.lovable.dev/history",
+            "https://lovable.dev/video/everyones-sleeping-on-this-lovable-n8n-combo-im-not-anymore"
+          ],
+          "search_results": [
+            {
+              "title": "Ship Like a Pro - Design Inspiration & Resources (28 Days of Lovable",
+              "url": "https://www.youtube.com/watch?v=IJnYWKdS_n4",
+              "date": "2026-02-18",
+              "last_updated": "2026-04-25",
+              "snippet": "... products look polished quickly because they reference quality UI ... dev: Thousands of premium component blocks like navbars and ...",
+              "source": "web"
+            },
+            {
+              "title": "Blog - Lovable",
+              "url": "https://lovable.dev/blog",
+              "date": "2025-02-11",
+              "last_updated": "2026-05-14",
+              "snippet": "Lovable will now helps you make sure your app is secure before going live. June 9, 2025. Lovable 2.0: What's New and What It Means for no-code ...",
+              "source": "web"
+            },
+            {
+              "title": "Lovable changelog",
+              "url": "https://docs.lovable.dev/changelog",
+              "date": "2026-04-24",
+              "last_updated": "2026-05-10",
+              "snippet": "Lovable changelog and product updates. Stay up to date with new features, improvements, and bug fixes shipped in Lovable.",
+              "source": "web"
+            },
+            {
+              "title": "I Just Replaced Lovable With This New AI Tool... - YouTube",
+              "url": "https://www.youtube.com/watch?v=h7h-ShDI3-Y",
+              "date": "2026-04-01",
+              "last_updated": "2026-05-14",
+              "snippet": "... new app 03:45 | Walking through the prompt used 04:30 | Exploring the Mocha UI (preview, code, database, analytics, email) 06:00 | Build ...",
+              "source": "web"
+            },
+            {
+              "title": "AI Solutions for Websites, Apps, and Businesses | Lovable",
+              "url": "https://lovable.dev/solutions",
+              "last_updated": "2026-05-12",
+              "snippet": "No-Code Solutions for Building Apps, Websites, and Products. Lovable lets you turn your idea into a real, working app or website without writing code.",
+              "source": "web"
+            },
+            {
+              "title": "Lovable 2.0 Just Launched: 5 Must-See Updates (And a ... - YouTube",
+              "url": "https://www.youtube.com/watch?v=12YlKk40YAI",
+              "date": "2025-04-25",
+              "last_updated": "2026-01-11",
+              "snippet": "... lovable here: https://lovable.dev/aiwithbrandon Grab the custom website prompt generator GPT plus 30 AI projects for Free here: https ...",
+              "source": "web"
+            },
+            {
+              "title": "Incident update, new Labs features and more - Lovable",
+              "url": "https://lovable.dev/blog/2025-01-07-changelog",
+              "date": "2025-01-07",
+              "last_updated": "2026-05-12",
+              "snippet": "We've added a new Labs section, accessible via Settings -> Account Settings -> Labs. This section allows you to enable and test experimental features.",
+              "source": "web"
+            },
+            {
+              "title": "History - Lovable Status",
+              "url": "https://status.lovable.dev/history",
+              "date": "2026-05-13",
+              "last_updated": "2026-05-13",
+              "snippet": "The issue causing increased error rates when creating new Lovable Cloud projects has been resolved. Our infrastructure vendor has implemented a fix and project ...",
+              "source": "web"
+            },
+            {
+              "title": "Everyone's Sleeping on This Lovable + n8n Combo (I'm Not Anymore)",
+              "url": "https://lovable.dev/video/everyones-sleeping-on-this-lovable-n8n-combo-im-not-anymore",
+              "date": "2025-06-24",
+              "last_updated": "2026-03-19",
+              "snippet": "The video is particularly valuable for developers, product managers, and ... We're going to 30:14 open up a new lovable app right there. 30:19 Going to ...",
+              "source": "web"
+            }
+          ],
+          "object": "chat.completion",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "## Lovable (lovable.dev)\nNo updates\n\n[No relevant links within the last 30 days]"
+              },
+              "delta": {
+                "role": "assistant",
+                "content": ""
+              },
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "id": "ebdbc510-6b84-4fce-9b2f-c0023a7bd6db",
+          "model": "sonar",
+          "created": 1778749740,
+          "usage": {
+            "prompt_tokens": 162,
+            "completion_tokens": 6,
+            "total_tokens": 168,
+            "search_context_size": "low",
+            "cost": {
+              "input_tokens_cost": 0.00016,
+              "output_tokens_cost": 0.00001,
+              "request_cost": 0.005,
+              "total_cost": 0.00517
+            }
+          },
+          "citations": [
+            "https://newsletter.posthog.com/p/from-0-to-40m-arr-inside-the-tech",
+            "https://support.bolt.new/account-and-subscription/tokens",
+            "https://support.bolt.new/building/using-bolt/rollback-backup",
+            "https://bolt.new"
+          ],
+          "search_results": [
+            {
+              "title": "How bolt.new works - by Lior Neu-ner - Product for Engineers",
+              "url": "https://newsletter.posthog.com/p/from-0-to-40m-arr-inside-the-tech",
+              "date": "2025-09-16",
+              "last_updated": "2026-03-12",
+              "snippet": "Recognizing that WebContainer was the perfect runtime for this new workflow, they pivoted and relaunched as Bolt in October 2024. In only 30 ...",
+              "source": "web"
+            },
+            {
+              "title": "Tokens - Bolt",
+              "url": "https://support.bolt.new/account-and-subscription/tokens",
+              "date": "2026-05-05",
+              "last_updated": "2026-05-12",
+              "snippet": "Click Reload tokens. The reload tokens option in Bolt Any tokens purchased as a reload do not expire. The price per token reload varies based on your plan ...",
+              "source": "web"
+            },
+            {
+              "title": "Backups, restore, and version history - Bolt",
+              "url": "https://support.bolt.new/building/using-bolt/rollback-backup",
+              "date": "2026-04-15",
+              "last_updated": "2026-05-13",
+              "snippet": "Version history ( ✓Recommended) – Browse, preview, label, and restore older versions of your project automatically saved by Bolt using the View history button.",
+              "source": "web"
+            },
+            {
+              "title": "Bolt.new",
+              "url": "https://bolt.new",
+              "last_updated": "2026-05-13",
+              "snippet": "# What will you build today?\n\nCreate stunning apps & websites by chatting with AI.\n\nor import from",
+              "source": "web"
+            }
+          ],
+          "object": "chat.completion",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "## Bolt.new\n\nNo updates"
+              },
+              "delta": {
+                "role": "assistant",
+                "content": ""
+              },
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "id": "8e42246e-f4a5-4cab-a39a-88ce093ebefd",
+          "model": "sonar",
+          "created": 1778749744,
+          "usage": {
+            "prompt_tokens": 163,
+            "completion_tokens": 403,
+            "total_tokens": 566,
+            "search_context_size": "low",
+            "cost": {
+              "input_tokens_cost": 0.00016,
+              "output_tokens_cost": 0.0004,
+              "request_cost": 0.005,
+              "total_cost": 0.00557
+            }
+          },
+          "citations": [
+            "https://docs.replit.com/updates/2025/12/26/changelog",
+            "https://www.saastr.com/why-ill-likely-spend-8000-on-replit-this-month-alone-and-why-thats-ok/",
+            "https://docs.replit.com/updates/2026/01/09/changelog",
+            "https://blog.replit.com",
+            "https://blog.replit.com/category/events"
+          ],
+          "search_results": [
+            {
+              "title": "December 26, 2025",
+              "url": "https://docs.replit.com/updates/2025/12/26/changelog",
+              "date": "2025-12-26",
+              "last_updated": "2026-05-12",
+              "snippet": "What's new. Gift cards; Replit Rewind 2025; Replit ChatGPT App; Credit packs holiday sale; Fast Build; learn.replit.com brand refresh; Security ...",
+              "source": "web"
+            },
+            {
+              "title": "Why I'll Likely Spend $8000 on Replit — This Month Alone. ...",
+              "url": "https://www.saastr.com/why-ill-likely-spend-8000-on-replit-this-month-alone-and-why-thats-ok/",
+              "date": "2025-07-17",
+              "last_updated": "2026-05-13",
+              "snippet": "Three and a half days into building my latest project, I checked my Replit ... Timeline: 30-45 days; Cost: $8,000-$10,000 (even worst case); Full control ...",
+              "source": "web"
+            },
+            {
+              "title": "January 09, 2026",
+              "url": "https://docs.replit.com/updates/2026/01/09/changelog",
+              "date": "2026-01-09",
+              "last_updated": "2026-05-13",
+              "snippet": "New AI models in Integrations. Support for newly-launched AI models is now available in AI Integrations: Model, Description. gpt-5.2, OpenAI's ...",
+              "source": "web"
+            },
+            {
+              "title": "Replit — Replit Blog – Product updates from the team",
+              "url": "https://blog.replit.com",
+              "date": "2026-03-11",
+              "last_updated": "2026-05-11",
+              "snippet": "The blog of the Replit team where we talk about new features, design, and engineering!",
+              "source": "web"
+            },
+            {
+              "title": "Events",
+              "url": "https://blog.replit.com/category/events",
+              "date": "2026-03-11",
+              "last_updated": "2026-05-13",
+              "snippet": "The blog of the Replit team where we talk about new features, design, and engineering!",
+              "source": "web"
+            }
+          ],
+          "object": "chat.completion",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "## Replit\n\n- **New products, capabilities, or features** (Dec 26, 2025): Replit released gift cards, Replit Rewind 2025, Replit ChatGPT App, credit packs holiday sale, Fast Build, and a brand refresh for learn.replit.com. Additional security updates mentioned. [https://docs.replit.com/updates/2025/12/26/changelog](https://docs.replit.com/updates/2025/12/26/changelog)\n\n- **Important updates, announcements, or changes** (Jan 9, 2026): New AI models added to Integrations, including gpt-5.2 from OpenAI and others. [https://docs.replit.com/updates/2026/01/09/changelog](https://docs.replit.com/updates/2026/01/09/changelog)\n\n- **Credible third-party analysis**: SaaS expert details spending $8000+ on Replit in a month for a project, highlighting high AI usage costs (e.g., avoid expensive models like Claude 4 Sonnet at 7.5x cost), with tips on budgets ($100-200/day) and alerts to manage burn. Timeline for project: 30-45 days at $8-10k. [https://www.saastr.com/why-ill-likely-spend-8000-on-replit-this-month-alone-and-why-thats-ok/](https://www.saastr.com/why-ill-likely-spend-8000-on-replit-this-month-alone-and-why-thats-ok/)\n\n**Links:**  \nhttps://docs.replit.com/updates/2025/12/26/changelog  \nhttps://docs.replit.com/updates/2026/01/09/changelog  \nhttps://www.saastr.com/why-ill-likely-spend-8000-on-replit-this-month-alone-and-why-thats-ok/"
+              },
+              "delta": {
+                "role": "assistant",
+                "content": ""
+              },
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      },
+      {
+        "json": {
+          "id": "038e12f0-12ad-482c-ab2e-2aaa219728a9",
+          "model": "sonar",
+          "created": 1778749740,
+          "usage": {
+            "prompt_tokens": 167,
+            "completion_tokens": 18,
+            "total_tokens": 185,
+            "search_context_size": "low",
+            "cost": {
+              "input_tokens_cost": 0.00017,
+              "output_tokens_cost": 0.00002,
+              "request_cost": 0.005,
+              "total_cost": 0.00519
+            }
+          },
+          "citations": [
+            "https://sparkco.ai/blog/v0-by-vercel",
+            "https://vercel.com/blog/introducing-the-new-v0",
+            "https://siliconangle.com/2025/08/11/vercels-v0-app-launches-allowing-anyone-create-deploy-working-app-website-using-prompts/",
+            "https://vercel.com/blog/v0-app",
+            "https://community.vercel.com/c/v0/59",
+            "https://v0.app",
+            "https://vercel.com/blog/category/v0",
+            "https://www.prismetric.com/what-is-vercel-v0/"
+          ],
+          "search_results": [
+            {
+              "title": "Explore v0 by Vercel: Features, Pricing, and Use Cases - Sparkco",
+              "url": "https://sparkco.ai/blog/v0-by-vercel",
+              "date": "2025-11-04",
+              "last_updated": "2026-05-12",
+              "snippet": "v0 by Vercel is a cutting-edge AI tool designed to streamline and enhance developer workflows. As part of Vercel's suite of development ...",
+              "source": "web"
+            },
+            {
+              "title": "Introducing the new v0 - Vercel",
+              "url": "https://vercel.com/blog/introducing-the-new-v0",
+              "date": "2026-02-03",
+              "last_updated": "2026-05-13",
+              "snippet": "The new v0 brings production-ready AI coding to enterprises with git workflows, security, and real integrations. Ship faster with agents and ...",
+              "source": "web"
+            },
+            {
+              "title": "Vercel's v0.app launches, allowing anyone to create and deploy a ...",
+              "url": "https://siliconangle.com/2025/08/11/vercels-v0-app-launches-allowing-anyone-create-deploy-working-app-website-using-prompts/",
+              "date": "2025-08-11",
+              "last_updated": "2025-08-11",
+              "snippet": "Vercel's v0.app launches, allowing anyone to create and deploy a working app or website using prompts. by Mike Wheatley.",
+              "source": "web"
+            },
+            {
+              "title": "v0.dev -> v0.app - Vercel",
+              "url": "https://vercel.com/blog/v0-app",
+              "date": "2025-08-11",
+              "last_updated": "2026-05-14",
+              "snippet": "v0.dev is now v0.app, the AI builder for everyone: founders, designers, developers, marketers, sales, finance, and more.",
+              "source": "web"
+            },
+            {
+              "title": "Latest v0 topics - Vercel Community",
+              "url": "https://community.vercel.com/c/v0/59",
+              "last_updated": "2026-05-14",
+              "snippet": "The new v0 docs are live now Check them out and ask any questions you like here https://v0.dev/docs. 11, 1484, January 24, 2026.",
+              "source": "web"
+            },
+            {
+              "title": "v0 by Vercel - Build Agents, Apps, and Websites with AI",
+              "url": "https://v0.app",
+              "date": "2026-02-27",
+              "last_updated": "2026-04-30",
+              "snippet": "Generate working applications in minutes with AI. Publish as live websites in seconds. Sync with a repo. Connect to GitHub and push code directly to your ...",
+              "source": "web"
+            },
+            {
+              "title": "v0 Blog - Vercel",
+              "url": "https://vercel.com/blog/category/v0",
+              "date": "2025-08-04",
+              "last_updated": "2026-05-06",
+              "snippet": "Since v0 became generally available in 2024, more than 4 million people have used it to turn their ideas into apps in minutes. v0 has helped people get ...",
+              "source": "web"
+            },
+            {
+              "title": "Vercel V0: Complete Guide for Developers and Entrepreneurs",
+              "url": "https://www.prismetric.com/what-is-vercel-v0/",
+              "date": "2025-10-08",
+              "snippet": "Vercel v0 is an AI tool that turns text prompts into code. Learn its features, pricing, pros, cons, and who should use it.",
+              "source": "web"
+            }
+          ],
+          "object": "chat.completion",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "## V0 by Vercel (v0.dev / v0.app)\n\nNo updates"
+              },
+              "delta": {
+                "role": "assistant",
+                "content": ""
+              },
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 3
+        }
+      },
+      {
+        "json": {
+          "id": "34dcc96e-3e62-40ac-8553-a6b57513bdaf",
+          "model": "sonar",
+          "created": 1778749743,
+          "usage": {
+            "prompt_tokens": 161,
+            "completion_tokens": 436,
+            "total_tokens": 597,
+            "search_context_size": "low",
+            "cost": {
+              "input_tokens_cost": 0.00016,
+              "output_tokens_cost": 0.00044,
+              "request_cost": 0.005,
+              "total_cost": 0.0056
+            }
+          },
+          "citations": [
+            "https://cursor.com/blog/cursor-3",
+            "https://cursor.com/changelog",
+            "https://cursor.com/changelog/page/2",
+            "https://cursor.com/blog",
+            "https://cursor.com",
+            "https://forum.cursor.com/t/update-available-whats-new/141859",
+            "https://cursor.com/changelog/page/4",
+            "https://releasebot.io/updates/cursor"
+          ],
+          "search_results": [
+            {
+              "title": "Meet the new Cursor",
+              "url": "https://cursor.com/blog/cursor-3",
+              "date": "2026-04-02",
+              "last_updated": "2026-05-13",
+              "snippet": "We're introducing Cursor 3, a unified workspace for building software with agents. The new Cursor interface brings clarity to the work agents ...",
+              "source": "web"
+            },
+            {
+              "title": "What's New in Cursor — Latest Updates & Release Notes",
+              "url": "https://cursor.com/changelog",
+              "date": "2026-05-13",
+              "last_updated": "2026-05-12",
+              "snippet": "This release introduces new tools for teams to configure development environments for their agents. Cursor also can use these tools to set ...",
+              "source": "web"
+            },
+            {
+              "title": "Changelog - Cursor",
+              "url": "https://cursor.com/changelog/page/2",
+              "date": "2026-05-04",
+              "last_updated": "2026-05-13",
+              "snippet": "This release introduces updates for Enterprise admins: a new system for model controls, updated spend management, and more detail for usage ...",
+              "source": "web"
+            },
+            {
+              "title": "Blog - Cursor",
+              "url": "https://cursor.com/blog",
+              "date": "2026-02-26",
+              "last_updated": "2026-05-13",
+              "snippet": "Latest updates and insights from the Cursor team. Learn about AI-powered coding, product updates, and development tips.",
+              "source": "web"
+            },
+            {
+              "title": "Cursor: The best way to code with AI",
+              "url": "https://cursor.com",
+              "date": "2026-05-13",
+              "last_updated": "2026-05-14",
+              "snippet": "Built to make you extraordinarily productive, Cursor is the best way to build software with AI.",
+              "source": "web"
+            },
+            {
+              "title": "Update Available -- What's New? - Feature Requests - Cursor",
+              "url": "https://forum.cursor.com/t/update-available-whats-new/141859",
+              "date": "2025-11-10",
+              "last_updated": "2026-05-07",
+              "snippet": "It seems that every day I get the little bottom right notification that there's an update. I get one option: basically update and restart.",
+              "source": "web"
+            },
+            {
+              "title": "Changelog - Cursor",
+              "url": "https://cursor.com/changelog/page/4",
+              "date": "2026-03-25",
+              "last_updated": "2026-05-14",
+              "snippet": "We've added more than 30 new plugins from partners such as Atlassian, Datadog, GitLab, Glean, Hugging Face, monday.com, and PlanetScale. Cursor ...",
+              "source": "web"
+            },
+            {
+              "title": "Cursor Release Notes - May 2026 Latest Updates - Releasebot",
+              "url": "https://releasebot.io/updates/cursor",
+              "date": "2026-05-11",
+              "last_updated": "2026-05-14",
+              "snippet": "Complete list of Cursor latest updates for May 2026: get every product news, release note, and changelog from Cursor summarized in one timeline.",
+              "source": "web"
+            }
+          ],
+          "object": "chat.completion",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "## Cursor (cursor.com)\n\n### New Products/Capabilities/Features\n- **Cursor 3** launched as a unified workspace for building software with agents, offering a new interface for higher abstraction levels and deeper inspection. ([https://cursor.com/blog/cursor-3](https://cursor.com/blog/cursor-3))\n- New tools for teams to configure development environments for agents. ([https://cursor.com/changelog](https://cursor.com/changelog))\n- Over 30 new plugins added from partners including Atlassian, Datadog, GitLab, Glean, Hugging Face, monday.com, and PlanetScale. ([https://cursor.com/changelog/page/4](https://cursor.com/changelog/page/4))\n\n### Important Updates/Announcements/Changes\n- Enterprise admin updates: new system for model controls, updated spend management, and more usage details. ([https://cursor.com/changelog/page/2](https://cursor.com/changelog/page/2))\n- Complete May 2026 updates summarized in a timeline. ([https://releasebot.io/updates/cursor](https://releasebot.io/updates/cursor))\n\n### User Complaints\n- Frequent daily update notifications with no release notes, risks, or \"What's New\" info in the popup; users request better transparency. ([https://forum.cursor.com/t/update-available-whats-new/141859](https://forum.cursor.com/t/update-available-whats-new/141859))\n\n**Relevant links:**  \n[https://cursor.com/blog/cursor-3](https://cursor.com/blog/cursor-3)  \n[https://cursor.com/changelog](https://cursor.com/changelog)  \n[https://cursor.com/changelog/page/2](https://cursor.com/changelog/page/2)  \n[https://cursor.com/changelog/page/4](https://cursor.com/changelog/page/4)  \n[https://forum.cursor.com/t/update-available-whats-new/141859](https://forum.cursor.com/t/update-available-whats-new/141859)  \n[https://releasebot.io/updates/cursor](https://releasebot.io/updates/cursor)"
+              },
+              "delta": {
+                "role": "assistant",
+                "content": ""
+              },
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 4
+        }
+      },
+      {
+        "json": {
+          "id": "cf005bb2-c237-44d6-b05a-1bea0a35f612",
+          "model": "sonar",
+          "created": 1778749742,
+          "usage": {
+            "prompt_tokens": 166,
+            "completion_tokens": 248,
+            "total_tokens": 414,
+            "search_context_size": "low",
+            "cost": {
+              "input_tokens_cost": 0.00017,
+              "output_tokens_cost": 0.00025,
+              "request_cost": 0.005,
+              "total_cost": 0.00541
+            }
+          },
+          "citations": [
+            "https://www.figma.com/blog/figma-make-general-availability/",
+            "https://forum.figma.com/share-your-feedback-26/figma-make-ai-credit-limits-not-feasible-51713/index7.html",
+            "https://www.figma.com/release-notes/",
+            "https://www.figma.com/make/",
+            "https://www.figma.com/blog/ai/"
+          ],
+          "search_results": [
+            {
+              "title": "Figma Make Is Now Available to All Users",
+              "url": "https://www.figma.com/blog/figma-make-general-availability/",
+              "date": "2025-07-24",
+              "last_updated": "2026-04-24",
+              "snippet": "Today, all Figma AI features and products are moving out of beta, including Figma Make—which is now available for everyone to try.",
+              "source": "web"
+            },
+            {
+              "title": "Figma Make Ai Credit Limits Not Feasible",
+              "url": "https://forum.figma.com/share-your-feedback-26/figma-make-ai-credit-limits-not-feasible-51713/index7.html",
+              "date": "2026-03-10",
+              "last_updated": "2026-04-17",
+              "snippet": "I built a prototype while Figma Make was in Beta with unlimited usage. Yesterday I blew through 3000 credits in less than a day. You would think ...",
+              "source": "web"
+            },
+            {
+              "title": "Figma product news and release notes",
+              "url": "https://www.figma.com/release-notes/",
+              "date": "2026-04-28",
+              "last_updated": "2026-05-12",
+              "snippet": "Available in all Figma products where you can make or edit images with AI: Figma Design, Draw, Buzz, Slides, and FigJam.",
+              "source": "web"
+            },
+            {
+              "title": "Figma Make: Create with AI-Powered Design Tools",
+              "url": "https://www.figma.com/make/",
+              "date": "2025-07-17",
+              "last_updated": "2026-05-14",
+              "snippet": "Figma Make empowers you to turn ideas into reality with AI-powered design tools—generate, iterate, and build faster, all in one creative space.",
+              "source": "web"
+            },
+            {
+              "title": "Tag: AI | Figma Blog",
+              "url": "https://www.figma.com/blog/ai/",
+              "date": "2024-04-29",
+              "last_updated": "2026-05-13",
+              "snippet": "Explore perspectives and insights on the role of AI in product design and development. Learn helpful tips and how to incorporate it into your work.",
+              "source": "web"
+            }
+          ],
+          "object": "chat.completion",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "## Figma\n\n**New products, capabilities, or features:** Figma Make and all Figma AI features (including Make, Edit Image, and Boost Resolution) have moved out of beta into general availability, now accessible to all users for generating, iterating, and building designs.\n\n**Important updates, announcements, or changes:** \n- Full seat users can publish or privately share Figma Make files (publishing still in beta).\n- View, Collab, and Dev seat users get unlimited drafts and relevant AI features.\n- Starter plan users get unlimited drafts and can share up to 3 files with team.\n- Other AI features limited to paid plans. AI usage now operates on credit limits, causing rapid consumption (e.g., 3000 credits in a day).\n\n**User complaints:** Paid users report credit limits as not feasible, requesting unlimited usage under paid plans and local refinements without credit costs.\n\nhttps://www.figma.com/blog/figma-make-general-availability/  \nhttps://forum.figma.com/share-your-feedback-26/figma-make-ai-credit-limits-not-feasible-51713/index7.html  \nhttps://www.figma.com/release-notes/  \nhttps://www.figma.com/make/"
+              },
+              "delta": {
+                "role": "assistant",
+                "content": ""
+              },
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 5
+        }
+      }
+    ],
+    "Prepare a report (Message a model)": [
+      {
+        "json": {
+          "id": "chatcmpl-DfMgQq2hkCyVLQ8mH2GMZQG1TJRg3",
+          "object": "chat.completion",
+          "created": 1778751014,
+          "model": "gpt-5-2025-08-07",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "## Competitor Monitoring Report (Last 30 Days)\n\n### Lovable\nNo updates\n\n### Bolt.new\nNo updates\n\n### Replit\nNo updates\n\n### V0 by Vercel\nNo updates\n\n### Cursor\n- Launched Cursor 3 as a unified workspace with agent-based development and a new higher‑level interface (source)[https://cursor.com/blog/cursor-3]\n- Introduced tools for teams to configure development environments for agents (source)[https://cursor.com/changelog]\n- Added 30+ partner plugins, including Atlassian, Datadog, GitLab, Glean, Hugging Face, monday.com, and PlanetScale (source)[https://cursor.com/changelog/page/4]\n- Rolled out enterprise admin updates: model controls, improved spend management, and expanded usage details (source)[https://cursor.com/changelog/page/2]\n- May 2026 updates summarized in an external timeline (source)[https://releasebot.io/updates/cursor]\n- User complaints about frequent update prompts lacking clear “What’s New” details (source)[https://forum.cursor.com/t/update-available-whats-new/141859]\n\n### Figma\n- Announced general availability of Figma Make and Figma AI features (Make, Edit Image, Boost Resolution) for wider access (source)[https://www.figma.com/blog/figma-make-general-availability/]\n- Updated seat and plan entitlements: full seats can publish/share Make files; View/Collab/Dev seats and Starter get unlimited drafts, with AI features varying by plan (source)[https://www.figma.com/blog/figma-make-general-availability/]\n- Shifted AI usage to credit-based limits; users report rapid credit consumption and request more generous or unlimited paid usage (source)[https://forum.figma.com/share-your-feedback-26/figma-make-ai-credit-limits-not-feasible-51713/index7.html]",
+                "refusal": null,
+                "annotations": []
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 1772,
+            "completion_tokens": 1368,
+            "total_tokens": 3140,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "audio_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 960,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            }
+          },
+          "service_tier": "default",
+          "system_fingerprint": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Research Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get competitors": {
+      "main": [
+        [
+          {
+            "node": "Message Perplexity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get competitors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare a report (Message a model)": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate responses": {
+      "main": [
+        [
+          {
+            "node": "Prepare a report (Message a model)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Agent": {
+      "main": [
+        [
+          {
+            "node": "Markdown1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get competitors1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Perplexity": {
+      "main": [
+        [
+          {
+            "node": "Parse response (JS script)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Perplexity1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get competitors3": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Perplexity3": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse response (JS script)": {
+      "main": [
+        [
+          {
+            "node": "Aggregate responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7ea04bcb-2356-463b-a3e3-9cb928fb57b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e9297840a9276622fc571cdeb8804b8d14b8ef599b5167cd238320b9e418f554"
+  },
+  "id": "Ht1fj2wKBOhz8Hq9",
+  "tags": [
+    {
+      "updatedAt": "2026-05-13T22:30:03.237Z",
+      "createdAt": "2026-05-13T22:30:03.237Z",
+      "id": "CWAyu1ERHM8qGDZP",
+      "name": "Agent"
+    }
+  ]
+}
