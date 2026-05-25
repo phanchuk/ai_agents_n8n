@@ -1,4 +1,4 @@
-# 🤖 AI Agents with n8n — Product Manager GenAI Portfolio
+# 🤖 AI Agents with n8n, OpenAI and Claude
 
 A collection of hands-on AI workflow projects focused on exploring practical applications of GenAI, AI agents, MCP integrations, workflow orchestration, and automation from a Product Manager perspective.
 
@@ -42,7 +42,9 @@ Key areas explored:
 **Tech stack:**  
 n8n · OpenAI · ElevenLabs · MCP · Jira · Gmail · Google Sheets · Elestio
 
-📁 See project README for architecture and implementation details.
+📁 [See project README for architecture and implementation details](.ai_voice_agent/README.md)
+
+<img width="1896" height="1016" alt="AI voice send email update" src="https://github.com/user-attachments/assets/dd9e0b0e-6067-4ffa-9366-cd2f33b681cf" />
 
 ---
 
@@ -63,7 +65,9 @@ Key areas explored:
 **Tech stack:**  
 n8n · OpenAI · Perplexity API · Google Sheets · Gmail
 
-📁 See project README for workflow and architecture details.
+📁 [See project README for workflow and architecture details](./competitor_research_agents/readme.md)
+
+<img width="1858" height="933" alt="image" src="https://github.com/user-attachments/assets/79ca4f61-b894-4911-a8af-5f3bd50409dd" />
 
 ---
 
@@ -84,7 +88,9 @@ Key areas explored:
 **Tech stack:**  
 Claude Desktop · MCP · Jira Cloud · Figma
 
-📁 See project README for setup instructions and examples.
+📁 [See project README for architecture and implementation details](./figma_jira_mcp_claude/readme.md)
+
+<img width="1773" height="974" alt="2026-05-19_19h03_50 - 1" src="https://github.com/user-attachments/assets/5928be55-8eae-421f-8405-1051a37fefac" />
 
 ---
 
