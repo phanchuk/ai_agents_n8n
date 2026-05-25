@@ -1,0 +1,298 @@
+{
+  "name": "My workflow - chat",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You're a helpful agent equipped with tools that helps the user achieve his goals in Jira.\n\nBefore making the request plan your work. You typically perform at least two steps:\n1. List available tools in Jira MCP\n2. Execute selected tool (e.g., jira_search) you got before. Do not guess\n\nUse memory to run your work and track the progress towarsd your goal.\n\n## Common mistakes\n- guessing the tool name\n- asking for clarification, make educated assimpptions instead\n\n\nUser request: \n{{ $json.query.request_to_jira }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -128,
+        -144
+      ],
+      "id": "d8d00cc8-9e65-4c09-b14e-9794388a8bf4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        64
+      ],
+      "id": "6ccef600-0291-4ca4-a286-1f8d13e51c18",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Erz0QFTZchYpKmhE",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $execution.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        64
+      ],
+      "id": "732ab98a-9bf0-4eb7-86a2-dc1784a8a57c",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to get information about email contacts. This will help you get email by name.",
+        "documentId": {
+          "__rl": true,
+          "value": "1duknHj8sbKkgWUckjl-sD6nDWCGEokZG9lnVtGJrEJU",
+          "mode": "list",
+          "cachedResultName": "Contacts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1duknHj8sbKkgWUckjl-sD6nDWCGEokZG9lnVtGJrEJU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1duknHj8sbKkgWUckjl-sD6nDWCGEokZG9lnVtGJrEJU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        64
+      ],
+      "id": "6f2e9c69-bc53-43d6-bd20-323e4b0bf9f3",
+      "name": "Contacts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mUfuHHddzr3tY0k3",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to send Gmail emails. Format body as HTML.",
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        352,
+        64
+      ],
+      "id": "e1b69853-1943-4b98-a22c-90743f415806",
+      "name": "Gmail",
+      "webhookId": "859648a2-8ffc-4d6a-a0dd-a00cb1417f57",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nxbjtgRAUPzTd6Yc",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "This tool allows you to get the list of supported tools from Jira via MCP server connection"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        0,
+        64
+      ],
+      "id": "64a0901c-4e21-4974-8fd0-9d015fb80a62",
+      "name": "List Jira Tools",
+      "credentials": {
+        "mcpClientApi": {
+          "id": "4Wyflxg2BstGzgo6",
+          "name": "MCP Client (STDIO) account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "This tools allows you to execute tools from Jira. Use this tool only if you know the exact tool name and its description. Do not guess",
+        "operation": "executeTool",
+        "toolName": "={{ $fromAI( \"toolName\") }}",
+        "toolParameters": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Tool_Parameters', ``, 'json') }}"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        112,
+        64
+      ],
+      "id": "397be753-ea3d-46e2-9fd1-5e7c240f827e",
+      "name": "Execute Jira Tools",
+      "credentials": {
+        "mcpClientApi": {
+          "id": "4Wyflxg2BstGzgo6",
+          "name": "MCP Client (STDIO) account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "d234a359-8ed5-4512-9051-15e6a84b8fbc",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        -144
+      ],
+      "id": "5a8c39b1-bfe9-45c6-815c-afbedf0cb53f",
+      "name": "Webhook",
+      "webhookId": "d234a359-8ed5-4512-9051-15e6a84b8fbc"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        208,
+        -144
+      ],
+      "id": "cb910732-b616-4247-832e-374073fed949",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contacts": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Jira Tools": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Jira Tools": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e2d9f13f-7a6c-43d6-ada9-1f07c90a79a2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "739b70f1cb5296cc04c2524166ec4d3143eb34238417538cc2d20659b7c1c1d3"
+  },
+  "id": "ubD9bzt4DRkLecG0",
+  "tags": []
+}
